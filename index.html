@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Spin to Win</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #e6faff;
+      font-family: 'Press Start 2P', cursive;
+      position: relative;
+    }
+
+    /* Mây */
+    .cloud {
+      position: absolute;
+      
+      animation: cloudFloat 3s ease-in-out infinite;
+      z-index: 2;
+    }
+    .cloud1 {
+    
+    top: 30px;
+    left: 0px;
+    width: 155px;
+    }
+    .cloud2 {
+    top: 50px;
+    right: 0px;
+    animation-delay: 1.2s;
+    width: 55px;
+    }
+
+    @keyframes cloudFloat {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+    /* Vòng quay */
+    #wheel {
+      position: absolute;
+      top: 24%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 90vw;
+      height: 90vw;   
+      background: url("numberwheel.png") no-repeat center center;
+      background-size: contain;
+      transition: transform 5s ease-out;
+      z-index: 2;
+    }
+
+    /* Nút PLAY nằm trong vòng quay */
+    #spinBtn {
+        position: absolute;
+    top: 69%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 175px;
+    height: 60px;
+    background: url(button.png) no-repeat center;
+    background-size: contain;
+    border: none;
+    cursor: pointer;
+    z-index: 3;
+}
+
+    /* Nhân vật */
+    .character {
+      position: absolute;
+      bottom: 45px;
+      left: 30px;
+      width: 80px;
+      z-index: 2;
+    }
+
+    /* Mèo */
+    .cat {
+      position: absolute;
+      bottom: 39px;
+      right: 30px;
+      width: 80px;
+      z-index: 2;
+    }
+
+    @keyframes bounceCat {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-5px); }
+    }
+
+    /* Nền */
+    .ground {
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      height: 160px;
+      background: url("background.png") no-repeat center bottom;
+      background-size: cover;
+      z-index: 1;
+    }
+    /* Hình tiêu đề SPIN TO WIN */
+.title {
+      position: absolute;
+    top: 45px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 400px;
+    z-index: 2;
+}
+/* Mũi tên chỉ vòng quay */
+.arrow {
+  position: absolute;
+  top: 20%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 40px;
+  z-index: 4;
+}
+/* POPUP trúng thưởng */
+.popup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.6);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+.popup-content {
+  background: white;
+  padding: 20px 30px;
+  border-radius: 12px;
+  text-align: center;
+  font-size: 18px;
+}
+.popup-content button {
+  margin-top: 15px;
+  padding: 10px 20px;
+  font-size: 16px;
+  background: #00bfff;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+/* FORM nhận quà */
+.form-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.6);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+.form-content {
+  background: white;
+  padding: 25px;
+  border-radius: 12px;
+  text-align: center;
+  font-size: 16px;
+  width: 80%;
+}
+.form-content input {
+  width: 90%;
+  margin: 8px 0;
+  padding: 10px;
+  font-size: 15px;
+}
+.form-content button {
+  padding: 10px 20px;
+  background: #28a745;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+  </style>
+</head>
+<!-- Popup hiển thị trúng thưởng -->
+<div class="popup" id="popup">
+  <div class="popup-content">
+    <p id="prizeText">Bạn trúng: 🎁</p>
+    <button id="claimBtn">Nhận quà</button>
+  </div>
+</div>
+
+<!-- Form điền thông tin người nhận -->
+<div class="form-container" id="formContainer">
+  <div class="form-content">
+    <h3>Thông tin nhận quà</h3>
+    <input type="text" id="name" placeholder="Tên của bạn">
+    <input type="tel" id="phone" placeholder="Số điện thoại">
+    <button onclick="submitInfo()">Gửi</button>
+  </div>
+</div>
+
+<body>
+
+  <!-- Mây -->
+  <img src="cloud1.png" class="cloud cloud1">
+  <img src="cloud2.png" class="cloud cloud2">
+
+<img src="arrow.png" class="arrow">
+
+<!-- Tiêu đề "SPIN TO WIN" -->
+<img src="name.png" class="title">
+
+  <!-- Vòng quay -->
+  <div id="wheel"></div>
+
+  <!-- Nút quay -->
+  <button id="spinBtn"></button>
+
+  <!-- Nhân vật -->
+  <img src="character.gif" class="character">
+
+  <!-- Mèo -->
+  <img src="catt.png" class="cat">
+
+  <!-- Nền -->
+  <div class="ground"></div>
+<!-- Âm thanh vòng quay -->
+
+<!-- Âm thanh vòng quay -->
+<audio id="spinSound" src="spin.mp3" preload="auto"></audio>
+
+<!-- Âm thanh chúc mừng -->
+<audio id="congratsSound" src="congrats.mp3" preload="auto"></audio>
+</body>
+<!-- Script điều khiển vòng quay -->
+<script>
+  // Hàm phát âm thanh với kiểm tra lỗi
+function playSound(audioElement) {
+  if (audioElement) {
+    audioElement.currentTime = 0; // Tua lại âm thanh về đầu
+    audioElement.play().catch((err) => {
+      console.error("Lỗi khi phát âm thanh:", err);
+    });
+  }
+}
+
+function spin() {
+  // Xoay vòng quay ngẫu nhiên
+  const deg = Math.floor(5000 + Math.random() * 5000);
+  document.getElementById("wheel").style.transform = `translateX(-50%) rotate(${deg}deg)`;
+
+  // Phát âm thanh quay
+  const spinSound = document.getElementById("spinSound");
+  playSound(spinSound);
+
+  // Sau khi quay xong, hiện popup chúc mừng
+  setTimeout(() => {
+    const congratsSound = document.getElementById("congratsSound");
+    playSound(congratsSound);
+    document.getElementById("popup").style.display = "flex";
+  }, 5200);
+}
+
+// Script chính điều khiển vòng quay
+const wheel = document.getElementById("wheel");
+const spinBtn = document.getElementById("spinBtn");
+const popup = document.getElementById("popup");
+const prizeText = document.getElementById("prizeText");
+const claimBtn = document.getElementById("claimBtn");
+const formContainer = document.getElementById("formContainer");
+
+let deg = 0;
+
+const prizes = [
+  "🎁 Quà 1",
+  "🎉 Quà 2",
+  "💎 Quà 3",
+  "🍀 Quà 4",
+  "🔥 Quà 5",
+  "🎊 Quà 6",
+  "🌟 Quà 7",
+  "💰 Quà 8"
+];
+
+spinBtn.addEventListener("click", () => {
+  spinBtn.disabled = true;
+
+  const min = 1024;
+  const max = 9999;
+  const rotate = Math.floor(Math.random() * (max - min)) + min;
+  deg += rotate;
+  wheel.style.transform = `translateX(-50%) rotate(${deg}deg)`;
+
+  // Phát âm thanh quay
+  const spinSound = document.getElementById("spinSound");
+  playSound(spinSound);
+
+  setTimeout(() => {
+    spinBtn.disabled = false;
+    const actualDeg = deg % 360;
+    const index = Math.floor((360 - actualDeg + 22.5) % 360 / 45);
+    prizeText.textContent = "Bạn trúng: " + prizes[index];
+    popup.style.display = "flex";
+    
+    // Phát âm thanh chúc mừng
+    const congratsSound = document.getElementById("congratsSound");
+    playSound(congratsSound);
+  }, 5200);
+});
+
+// Khi nhấn nút Nhận quà
+claimBtn.addEventListener("click", () => {
+  popup.style.display = "none";
+  formContainer.style.display = "flex";
+});
+
+// Gửi thông tin người nhận
+function submitInfo() {
+  const name = document.getElementById("name").value.trim();
+  const phone = document.getElementById("phone").value.trim();
+  const prize = prizeText.textContent.replace("Bạn trúng: ", "");
+
+  if (name === "" || phone === "") {
+    alert("Vui lòng điền đầy đủ thông tin!");
+    return;
+  }
+
+  fetch("https://script.google.com/macros/s/AKfycbxRtjm7u8zG0eVZBUULjqc3pm3nZdKdlnsV6hRL8ls-lPHjSdmFZbT1X3_EEmU1fc5V/exec", {
+    method: "POST",
+    mode: "no-cors",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ name, phone, prize })
+  })
+  .then(() => {
+    alert("Gửi thông tin thành công!");
+    formContainer.style.display = "none";
+  })
+  .catch((err) => {
+    console.error(err);
+    alert("Có lỗi xảy ra khi gửi!");
+  });
+}
+</script>
+
+
+
+</html>
